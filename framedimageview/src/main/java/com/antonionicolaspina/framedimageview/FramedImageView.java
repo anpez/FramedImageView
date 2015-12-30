@@ -16,10 +16,18 @@ import android.view.View;
 
 public final class FramedImageView extends View implements ScaleGestureDetector.OnScaleGestureListener {
   private static final String TAG = FramedImageView.class.getSimpleName();
+  private static final int INVALID_POINTER_ID = -1;
 
   private Bitmap image;
   private Bitmap frame;
   private float scale = 1.0f;
+  private Rect frameDestinationRect = new Rect();
+
+  private int activePointerId = INVALID_POINTER_ID;
+  private float activePointerX;
+  private float activePointerY;
+  private float positionX;
+  private float positionY;
 
   public FramedImageView(Context context) {
     super(context);
@@ -51,6 +59,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     int frameResId = attrs.getResourceId(R.styleable.FramedImageView_frame, View.NO_ID);
     if (View.NO_ID != frameResId) {
       frame = BitmapFactory.decodeResource(context.getResources(), frameResId);
+      frameDestinationRect.right = frame.getWidth();
+      frameDestinationRect.bottom = frame.getHeight();
     }
 
     attrs.recycle();
@@ -62,19 +72,56 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     super.onDraw(canvas);
 
     canvas.save();
+    canvas.translate(positionX, positionY);
     canvas.scale(scale, scale);
-    canvas.drawBitmap(image, null, new Rect(0, 0, image.getWidth(), image.getHeight()), null);
+    canvas.drawBitmap(image, 0, 0, null);
     canvas.restore();
 
-    canvas.drawBitmap(frame, null, new Rect(0, 0, frame.getWidth(), frame.getHeight()), null);
+    canvas.drawBitmap(frame, null, frameDestinationRect, null);
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     gestureDetector.onTouchEvent(event);
-    switch(event.getActionMasked()) {
+
+    final int action = event.getAction();
+    switch(action & MotionEvent.ACTION_MASK) {
       case MotionEvent.ACTION_DOWN:
+        activePointerId = event.getPointerId(0);
+        activePointerX = event.getX(activePointerId);
+        activePointerY = event.getY(activePointerId);
+        break;
+      case MotionEvent.ACTION_UP:
+        activePointerId = INVALID_POINTER_ID;
+        break;
+      case MotionEvent.ACTION_POINTER_UP: {
+        // Extract the index of the pointer that left the touch sensor
+        final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        final int pointerId = event.getPointerId(pointerIndex);
+
+        if (pointerId == activePointerId) { // This was our active pointer going up. Choose a new active pointer and adjust accordingly.
+          final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+          activePointerX = event.getX(newPointerIndex);
+          activePointerY = event.getY(newPointerIndex);
+          activePointerId = event.getPointerId(newPointerIndex);
+        }
+        break;
+      }
+      case MotionEvent.ACTION_MOVE: {
+        final int pointerIndex = event.findPointerIndex(activePointerId);
+
+        final float x = event.getX(pointerIndex);
+        final float y = event.getY(pointerIndex);
+
+        positionX += x - activePointerX;
+        positionY += y - activePointerY;
+
+        activePointerX = x;
+        activePointerY = y;
+
+        invalidate();
         return true;
+      }
     }
     return true;
   }
