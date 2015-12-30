@@ -71,13 +71,17 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
 
-    canvas.save();
-    canvas.translate(positionX, positionY);
-    canvas.scale(scale, scale);
-    canvas.drawBitmap(image, 0, 0, null);
-    canvas.restore();
+    if (null != image) {
+      canvas.save();
+      canvas.translate(positionX, positionY);
+      canvas.scale(scale, scale);
+      canvas.drawBitmap(image, 0, 0, null);
+      canvas.restore();
+    }
 
-    canvas.drawBitmap(frame, null, frameDestinationRect, null);
+    if (null != frame) {
+      canvas.drawBitmap(frame, null, frameDestinationRect, null);
+    }
   }
 
   @Override
@@ -124,6 +128,28 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       }
     }
     return true;
+  }
+
+
+  @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    int width  = MeasureSpec.getSize(widthMeasureSpec);
+    int height = MeasureSpec.getSize(heightMeasureSpec);
+
+    Log.d(TAG, String.format("onMeasure(%d, %d)", width, height));
+
+    if (null != frame) {
+      final float frameWidth  = frame.getWidth();
+      final float frameHeight = frame.getHeight();
+      final float scale       = Math.min(width/frameWidth, height/frameHeight);
+      width  = (int) (scale*frameWidth);
+      height = (int) (scale*frameHeight);
+    }
+
+    Log.d(TAG, String.format("setMeasuredDimension(%d, %d)", width, height));
+    frameDestinationRect.right  = width;
+    frameDestinationRect.bottom = height;
+    setMeasuredDimension(width, height);
   }
 
   @Override
