@@ -10,8 +10,10 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <com.antonionicolaspina.framedimageview.FramedImageView
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/black"
         app:frame="@drawable/frame"
         app:image="@drawable/sample"/>
 </RelativeLayout>

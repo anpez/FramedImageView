@@ -20,6 +20,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   private Bitmap image;
   private Bitmap frame;
+  private float minScale = 0.1f;
+  private float maxScale = 5f;
   private float scale = 1.0f;
   private Rect frameDestinationRect = new Rect();
 
@@ -36,34 +38,39 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   public FramedImageView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    init(context, context.getTheme().obtainStyledAttributes(attrs, R.styleable.FramedImageView, 0, 0));
+    init(context, attrs);
   }
 
   public FramedImageView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    init(context, context.getTheme().obtainStyledAttributes(attrs, R.styleable.FramedImageView, 0, 0));
+    init(context, attrs);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public FramedImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
-    init(context, context.getTheme().obtainStyledAttributes(attrs, R.styleable.FramedImageView, 0, 0));
+    init(context, attrs);
   }
 
   ScaleGestureDetector gestureDetector;
-  protected void init(Context context, TypedArray attrs) {
-    int imageResId = attrs.getResourceId(R.styleable.FramedImageView_image, View.NO_ID);
-    if (View.NO_ID != imageResId) {
-      image = BitmapFactory.decodeResource(context.getResources(), imageResId);
-    }
-    int frameResId = attrs.getResourceId(R.styleable.FramedImageView_frame, View.NO_ID);
-    if (View.NO_ID != frameResId) {
-      frame = BitmapFactory.decodeResource(context.getResources(), frameResId);
-      frameDestinationRect.right = frame.getWidth();
-      frameDestinationRect.bottom = frame.getHeight();
+  protected void init(Context context, AttributeSet attributes) {
+    if (null != attributes) {
+      TypedArray attrs = context.getTheme().obtainStyledAttributes(attributes, R.styleable.FramedImageView, 0, 0);
+      int imageResId = attrs.getResourceId(R.styleable.FramedImageView_image, View.NO_ID);
+      if (View.NO_ID != imageResId) {
+        image = BitmapFactory.decodeResource(context.getResources(), imageResId);
+      }
+      int frameResId = attrs.getResourceId(R.styleable.FramedImageView_frame, View.NO_ID);
+      if (View.NO_ID != frameResId) {
+        frame = BitmapFactory.decodeResource(context.getResources(), frameResId);
+        frameDestinationRect.right = frame.getWidth();
+        frameDestinationRect.bottom = frame.getHeight();
+      }
+      minScale = attrs.getFloat(R.styleable.FramedImageView_minScale, minScale);
+      maxScale = attrs.getFloat(R.styleable.FramedImageView_maxScale, maxScale);
+      attrs.recycle();
     }
 
-    attrs.recycle();
     gestureDetector = new ScaleGestureDetector(context, this);
   }
 
@@ -154,8 +161,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   @Override
   public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-    float scale = scaleGestureDetector.getScaleFactor();
-    this.scale *= scale;
+    float scaleFactor = scaleGestureDetector.getScaleFactor();
+    scale = Math.max(minScale, Math.min(scale*scaleFactor, maxScale));
     invalidate();
     return true;
   }
