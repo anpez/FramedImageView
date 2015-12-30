@@ -153,6 +153,17 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       height = (int) (scale*frameHeight);
     }
 
+    if (null != image) {
+      final float imageWidth  = image.getWidth();
+      final float imageHeight = image.getHeight();
+      scale = Math.min(width/imageWidth, height/imageHeight);
+      positionX = (width - imageWidth*scale)/2f;
+      positionY = (height - imageHeight*scale)/2f;
+      if (scale < minScale) {
+        minScale = scale;
+      }
+    }
+
     Log.d(TAG, String.format("setMeasuredDimension(%d, %d)", width, height));
     frameDestinationRect.right  = width;
     frameDestinationRect.bottom = height;
