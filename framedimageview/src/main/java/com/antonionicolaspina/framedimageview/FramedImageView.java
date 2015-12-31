@@ -18,6 +18,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private static final String TAG = FramedImageView.class.getSimpleName();
   private static final int INVALID_POINTER_ID = -1;
 
+  private ScaleGestureDetector gestureDetector;
+
   private Bitmap image;
   private Bitmap frame;
   private float minScale = 0.1f;
@@ -34,6 +36,9 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private int viewWidth;
   private int viewHeight;
 
+  /******************
+   ** Constructors **
+   ******************/
   public FramedImageView(Context context) {
     super(context);
     init(context, null);
@@ -55,7 +60,6 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     init(context, attrs);
   }
 
-  ScaleGestureDetector gestureDetector;
   protected void init(Context context, AttributeSet attributes) {
     if (null != attributes) {
       TypedArray attrs = context.getTheme().obtainStyledAttributes(attributes, R.styleable.FramedImageView, 0, 0);
@@ -140,7 +144,6 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     return true;
   }
 
-
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     viewWidth  = MeasureSpec.getSize(widthMeasureSpec);
@@ -181,17 +184,48 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
   }
 
+  /******************
+   ***** Setters ****
+   ******************/
+
+  /**
+   * Set a drawable as the touch-controlled image.
+   * @param resourceId Resource identificator.
+   */
   public void setImage(int resourceId) {
-    image = BitmapFactory.decodeResource(getResources(), resourceId);
+    setImage(BitmapFactory.decodeResource(getResources(), resourceId));
+  }
+
+  /**
+   * Set a drawable as the overlayed frame over the image.
+   * @param resourceId Resource identificator.
+   */
+  public void setFrame(int resourceId) {
+    setFrame(BitmapFactory.decodeResource(getResources(), resourceId));
+  }
+
+  /**
+   * Set a bitmap as the touch-controlled image.
+   * @param bitmap Bitmap.
+   */
+  public void setImage(Bitmap bitmap) {
+    image = bitmap;
     resetPositions();
     invalidate();
   }
 
-  public void setFrame(int resourceId) {
-    frame = BitmapFactory.decodeResource(getResources(), resourceId);
+  /**
+   * Set a bitmap as the overlayed frame over the image.
+   * @param bitmap Bitmap.
+   */
+  public void setFrame(Bitmap bitmap) {
+    frame = bitmap;
     requestLayout();
   }
 
+  /**
+   * Reset image position and scale.
+   */
   public void resetPositions() {
     if (null != image) {
       final float imageWidth  = image.getWidth();
