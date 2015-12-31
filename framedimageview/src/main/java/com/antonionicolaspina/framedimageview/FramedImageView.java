@@ -31,6 +31,9 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private float positionX;
   private float positionY;
 
+  private int viewWidth;
+  private int viewHeight;
+
   public FramedImageView(Context context) {
     super(context);
     init(context, null);
@@ -58,14 +61,14 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       TypedArray attrs = context.getTheme().obtainStyledAttributes(attributes, R.styleable.FramedImageView, 0, 0);
       int imageResId = attrs.getResourceId(R.styleable.FramedImageView_image, View.NO_ID);
       if (View.NO_ID != imageResId) {
-        image = BitmapFactory.decodeResource(context.getResources(), imageResId);
+        setImage(imageResId);
       }
+
       int frameResId = attrs.getResourceId(R.styleable.FramedImageView_frame, View.NO_ID);
       if (View.NO_ID != frameResId) {
-        frame = BitmapFactory.decodeResource(context.getResources(), frameResId);
-        frameDestinationRect.right = frame.getWidth();
-        frameDestinationRect.bottom = frame.getHeight();
+        setFrame(frameResId);
       }
+
       minScale = attrs.getFloat(R.styleable.FramedImageView_minScale, minScale);
       maxScale = attrs.getFloat(R.styleable.FramedImageView_maxScale, maxScale);
       attrs.recycle();
@@ -140,34 +143,25 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    int width  = MeasureSpec.getSize(widthMeasureSpec);
-    int height = MeasureSpec.getSize(heightMeasureSpec);
+    viewWidth  = MeasureSpec.getSize(widthMeasureSpec);
+    viewHeight = MeasureSpec.getSize(heightMeasureSpec);
 
-    Log.d(TAG, String.format("onMeasure(%d, %d)", width, height));
+    Log.d(TAG, String.format("onMeasure(%d, %d)", viewWidth, viewHeight));
 
     if (null != frame) {
       final float frameWidth  = frame.getWidth();
       final float frameHeight = frame.getHeight();
-      final float scale       = Math.min(width/frameWidth, height/frameHeight);
-      width  = (int) (scale*frameWidth);
-      height = (int) (scale*frameHeight);
+      final float scale       = Math.min(viewWidth/frameWidth, viewHeight/frameHeight);
+      viewWidth  = (int) (scale*frameWidth);
+      viewHeight = (int) (scale*frameHeight);
     }
 
-    if (null != image) {
-      final float imageWidth  = image.getWidth();
-      final float imageHeight = image.getHeight();
-      scale = Math.min(width/imageWidth, height/imageHeight);
-      positionX = (width - imageWidth*scale)/2f;
-      positionY = (height - imageHeight*scale)/2f;
-      if (scale < minScale) {
-        minScale = scale;
-      }
-    }
+    resetPositions();
 
-    Log.d(TAG, String.format("setMeasuredDimension(%d, %d)", width, height));
-    frameDestinationRect.right  = width;
-    frameDestinationRect.bottom = height;
-    setMeasuredDimension(width, height);
+    Log.d(TAG, String.format("setMeasuredDimension(%d, %d)", viewWidth, viewHeight));
+    frameDestinationRect.right  = viewWidth;
+    frameDestinationRect.bottom = viewHeight;
+    setMeasuredDimension(viewWidth, viewHeight);
   }
 
   @Override
@@ -185,5 +179,29 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   @Override
   public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
+  }
+
+  public void setImage(int resourceId) {
+    image = BitmapFactory.decodeResource(getResources(), resourceId);
+    resetPositions();
+    invalidate();
+  }
+
+  public void setFrame(int resourceId) {
+    frame = BitmapFactory.decodeResource(getResources(), resourceId);
+    requestLayout();
+  }
+
+  public void resetPositions() {
+    if (null != image) {
+      final float imageWidth  = image.getWidth();
+      final float imageHeight = image.getHeight();
+      scale = Math.min(viewWidth/imageWidth, viewHeight/imageHeight);
+      positionX = (viewWidth - imageWidth*scale)/2f;
+      positionY = (viewHeight - imageHeight*scale)/2f;
+      if (scale < minScale) {
+        minScale = scale;
+      }
+    }
   }
 }
