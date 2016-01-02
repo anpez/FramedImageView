@@ -5,5 +5,6 @@
         <attr name="frame" format="reference" />
         <attr name="minScale" format="float" />
         <attr name="maxScale" format="float" />
+        <attr name="panEnabled" format="boolean" />
     </declare-styleable>
 </resources>

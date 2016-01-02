@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -35,6 +34,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   private int viewWidth;
   private int viewHeight;
+
+  private boolean panEnabled;
 
   /******************
    ** Constructors **
@@ -75,6 +76,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
       minScale = attrs.getFloat(R.styleable.FramedImageView_minScale, minScale);
       maxScale = attrs.getFloat(R.styleable.FramedImageView_maxScale, maxScale);
+      panEnabled = attrs.getBoolean(R.styleable.FramedImageView_panEnabled, panEnabled);
       attrs.recycle();
     }
 
@@ -101,6 +103,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     gestureDetector.onTouchEvent(event);
+    super.onTouchEvent(event);
 
     final int action = event.getAction();
     switch(action & MotionEvent.ACTION_MASK) {
@@ -108,10 +111,10 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
         activePointerId = event.getPointerId(0);
         activePointerX = event.getX(activePointerId);
         activePointerY = event.getY(activePointerId);
-        break;
+        return true;
       case MotionEvent.ACTION_UP:
         activePointerId = INVALID_POINTER_ID;
-        break;
+        return true;
       case MotionEvent.ACTION_POINTER_UP: {
         // Extract the index of the pointer that left the touch sensor
         final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
@@ -123,7 +126,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
           activePointerY = event.getY(newPointerIndex);
           activePointerId = event.getPointerId(newPointerIndex);
         }
-        break;
+        return true;
       }
       case MotionEvent.ACTION_MOVE: {
         final int pointerIndex = event.findPointerIndex(activePointerId);
@@ -131,17 +134,19 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
         final float x = event.getX(pointerIndex);
         final float y = event.getY(pointerIndex);
 
-        positionX += x - activePointerX;
-        positionY += y - activePointerY;
+        if (panEnabled) {
+          positionX += x - activePointerX;
+          positionY += y - activePointerY;
+          invalidate();
+        }
 
         activePointerX = x;
         activePointerY = y;
 
-        invalidate();
         return true;
       }
     }
-    return true;
+    return false;
   }
 
   @Override
