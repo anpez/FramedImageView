@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -30,8 +31,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private int activePointerId = INVALID_POINTER_ID;
   private float activePointerX;
   private float activePointerY;
-  private float positionX;
-  private float positionY;
+  private PointF position = new PointF();
 
   private int viewWidth;
   private int viewHeight;
@@ -90,7 +90,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
     if (null != image) {
       canvas.save();
-      canvas.translate(positionX, positionY);
+      canvas.translate(position.x, position.y);
       canvas.scale(scale, scale);
       canvas.drawBitmap(image, 0, 0, null);
       canvas.restore();
@@ -136,8 +136,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
         final float y = event.getY(pointerIndex);
 
         if (panEnabled) {
-          positionX += x - activePointerX;
-          positionY += y - activePointerY;
+          position.x += x - activePointerX;
+          position.y += y - activePointerY;
           invalidate();
         }
 
@@ -248,8 +248,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       final float imageHeight = image.getHeight();
       scale = Math.min(viewWidth/imageWidth, viewHeight/imageHeight);
       relativeScale = 1f;
-      positionX = (viewWidth - imageWidth*scale)/2f;
-      positionY = (viewHeight - imageHeight*scale)/2f;
+      position.x = (viewWidth - imageWidth*scale)/2f;
+      position.y = (viewHeight - imageHeight*scale)/2f;
     }
   }
 
@@ -259,5 +259,13 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
    */
   public float getScale() {
     return relativeScale;
+  }
+
+  /**
+   * Return offset position between the image and the frame.
+   * @return Pointf containing x and y offsets, as a per-one value. Eg. 0=top-left, 1=bottom-right.
+   */
+  public PointF getOffset() {
+    return new PointF(position.x/viewWidth, position.y/viewHeight);
   }
 }
