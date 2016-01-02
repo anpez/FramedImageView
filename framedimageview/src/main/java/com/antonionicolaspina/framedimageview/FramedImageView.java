@@ -15,7 +15,6 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public final class FramedImageView extends View implements ScaleGestureDetector.OnScaleGestureListener {
-  private static final String TAG = FramedImageView.class.getSimpleName();
   private static final int INVALID_POINTER_ID = -1;
 
   private ScaleGestureDetector gestureDetector;
