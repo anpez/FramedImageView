@@ -24,6 +24,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private float minScale = 0.1f;
   private float maxScale = 5f;
   private float scale = 1.0f;
+  private float relativeScale = 1.0f;
   private Rect frameDestinationRect = new Rect();
 
   private int activePointerId = INVALID_POINTER_ID;
@@ -183,7 +184,9 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   @Override
   public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
     float scaleFactor = scaleGestureDetector.getScaleFactor();
-    scale = Math.max(minScale, Math.min(scale*scaleFactor, maxScale));
+    float relativeFactor = scale/relativeScale;
+    relativeScale = Math.max(minScale, Math.min(relativeScale*scaleFactor, maxScale));
+    scale         = relativeFactor*relativeScale;
     invalidate();
     return true;
   }
@@ -198,7 +201,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   }
 
   /******************
-   ***** Setters ****
+   ***** Public ****
    ******************/
 
   /**
@@ -244,11 +247,17 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       final float imageWidth  = image.getWidth();
       final float imageHeight = image.getHeight();
       scale = Math.min(viewWidth/imageWidth, viewHeight/imageHeight);
+      relativeScale = 1f;
       positionX = (viewWidth - imageWidth*scale)/2f;
       positionY = (viewHeight - imageHeight*scale)/2f;
-      if (scale < minScale) {
-        minScale = scale;
-      }
     }
+  }
+
+  /**
+   * Get relative scale between image and frame.
+   * @return scale as a per-one value.
+   */
+  public float getScale() {
+    return relativeScale;
   }
 }
