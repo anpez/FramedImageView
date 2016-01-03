@@ -6,14 +6,14 @@ A custom view to show a pannable and scalable image behind a fixed frame.
 ![Snapshot](https://raw.githubusercontent.com/ANPez/FramedImageView/master/snapshot.gif)
 
 ## Requirements
-Android 4.0, API 14
+Android 2.2, API 8
 
 ## Usage
 ### Gradle dependency
 
 ```groovy
 dependencies {
-  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.1'
+  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.2'
 }
 ```
 
