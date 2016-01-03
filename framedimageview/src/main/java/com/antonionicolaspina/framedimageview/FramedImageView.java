@@ -21,7 +21,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   private Bitmap image;
   private Bitmap frame;
-  private float minScale = 0.1f;
+  private float minScale = 0.25f;
   private float maxScale = 5f;
   private float scale = 1.0f;
   private float relativeScale = 1.0f;
