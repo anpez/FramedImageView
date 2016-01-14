@@ -23,12 +23,15 @@ dependencies {
 <com.antonionicolaspina.framedimageview.FramedImageView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:frame="@drawable/frame"
-    app:image="@drawable/sample"/>
+    app:fiv_minScale="0.25"
+    app:fiv_maxScale="5"
+    app:fiv_panEnabled="true"
+    app:fiv_frame="@drawable/frame"
+    app:fiv_image="@drawable/sample"/>
 ```
 
 ## License
-    Copyright 2015 Antonio Nicolás Pina
+    Copyright 2016 Antonio Nicolás Pina
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

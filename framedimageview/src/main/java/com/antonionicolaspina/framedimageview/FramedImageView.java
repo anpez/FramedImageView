@@ -64,19 +64,19 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   protected void init(Context context, AttributeSet attributes) {
     if (null != attributes) {
       TypedArray attrs = context.getTheme().obtainStyledAttributes(attributes, R.styleable.FramedImageView, 0, 0);
-      int imageResId = attrs.getResourceId(R.styleable.FramedImageView_image, View.NO_ID);
+      int imageResId = attrs.getResourceId(R.styleable.FramedImageView_fiv_image, View.NO_ID);
       if (View.NO_ID != imageResId) {
         setImage(imageResId);
       }
 
-      int frameResId = attrs.getResourceId(R.styleable.FramedImageView_frame, View.NO_ID);
+      int frameResId = attrs.getResourceId(R.styleable.FramedImageView_fiv_frame, View.NO_ID);
       if (View.NO_ID != frameResId) {
         setFrame(frameResId);
       }
 
-      minScale = attrs.getFloat(R.styleable.FramedImageView_minScale, minScale);
-      maxScale = attrs.getFloat(R.styleable.FramedImageView_maxScale, maxScale);
-      panEnabled = attrs.getBoolean(R.styleable.FramedImageView_panEnabled, panEnabled);
+      minScale = attrs.getFloat(R.styleable.FramedImageView_fiv_minScale, minScale);
+      maxScale = attrs.getFloat(R.styleable.FramedImageView_fiv_maxScale, maxScale);
+      panEnabled = attrs.getBoolean(R.styleable.FramedImageView_fiv_panEnabled, panEnabled);
       attrs.recycle();
     }
 

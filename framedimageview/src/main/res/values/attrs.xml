@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="FramedImageView">
-        <attr name="image" format="reference" />
-        <attr name="frame" format="reference" />
-        <attr name="minScale" format="float" />
-        <attr name="maxScale" format="float" />
-        <attr name="panEnabled" format="boolean" />
+        <attr name="fiv_image" format="reference" />
+        <attr name="fiv_frame" format="reference" />
+        <attr name="fiv_minScale" format="float" />
+        <attr name="fiv_maxScale" format="float" />
+        <attr name="fiv_panEnabled" format="boolean" />
     </declare-styleable>
 </resources>
