@@ -13,7 +13,7 @@ Android 2.2, API 8
 
 ```groovy
 dependencies {
-  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.2'
+  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.3'
 }
 ```
 
