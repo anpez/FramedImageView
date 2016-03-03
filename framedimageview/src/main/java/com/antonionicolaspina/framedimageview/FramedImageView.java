@@ -33,6 +33,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private float activePointerX;
   private float activePointerY;
   private PointF position = new PointF();
+  private PointF rotationCenter = new PointF();
 
   private int viewWidth;
   private int viewHeight;
@@ -95,15 +96,15 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     if (null != image) {
       canvas.save();
 
-      if (rotationEnabled) {
-        canvas.rotate(-rotation, activePointerX, activePointerY);
-      }
-
       if (panEnabled) {
         canvas.translate(position.x, position.y);
       }
 
       canvas.scale(scale, scale);
+
+      if (rotationEnabled) {
+        canvas.rotate(-rotation, activePointerX, activePointerY);
+      }
 
       canvas.drawBitmap(image, 0, 0, null);
       canvas.restore();
@@ -218,6 +219,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   public void OnRotation(RotationGestureDetector rotationDetector) {
     if (rotationEnabled) {
       rotation = rotationDetector.getAngle();
+      rotationCenter.x = activePointerX;
+      rotationCenter.y = activePointerY;
       invalidate();
     }
   }
@@ -297,5 +300,14 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
    */
   public float getRotation() {
     return -rotation;
+  }
+
+
+  /**
+   * Return rotation center position.
+   * @return Pointf containing x and y offsets, as a per-one value. Eg. 0=top-left, 1=bottom-right.
+   */
+  public PointF getRotationCenter() {
+    return new PointF(rotationCenter.x/viewWidth, rotationCenter.y/viewHeight);
   }
 }
