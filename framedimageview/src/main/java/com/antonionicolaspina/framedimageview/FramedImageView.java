@@ -28,6 +28,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private float relativeScale = 1.0f;
   private Rect frameDestinationRect = new Rect();
   private float rotation = 0f;
+  private float previousRotation = 0f;
 
   private int activePointerId = INVALID_POINTER_ID;
   private float activePointerX;
@@ -96,15 +97,15 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     if (null != image) {
       canvas.save();
 
+      if (rotationEnabled) {
+        canvas.rotate(-rotation, rotationCenter.x, rotationCenter.y);
+      }
+
       if (panEnabled) {
         canvas.translate(position.x, position.y);
       }
 
       canvas.scale(scale, scale);
-
-      if (rotationEnabled) {
-        canvas.rotate(-rotation, activePointerX, activePointerY);
-      }
 
       canvas.drawBitmap(image, 0, 0, null);
       canvas.restore();
@@ -130,6 +131,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
         return true;
       case MotionEvent.ACTION_UP:
         activePointerId = INVALID_POINTER_ID;
+        previousRotation = 0f;
         return true;
       case MotionEvent.ACTION_POINTER_UP: {
         // Extract the index of the pointer that left the touch sensor
@@ -153,6 +155,8 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
         if (panEnabled) {
           position.x += x - activePointerX;
           position.y += y - activePointerY;
+          rotationCenter.x += x - activePointerX;
+          rotationCenter.y += y - activePointerY;
           invalidate();
         }
 
@@ -218,7 +222,9 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   @Override
   public void OnRotation(RotationGestureDetector rotationDetector) {
     if (rotationEnabled) {
-      rotation = rotationDetector.getAngle();
+      rotation += rotationDetector.getAngle() - previousRotation;
+      previousRotation = rotationDetector.getAngle();
+
       rotationCenter.x = activePointerX;
       rotationCenter.y = activePointerY;
       invalidate();
@@ -275,6 +281,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       relativeScale = 1f;
       position.x = (viewWidth - imageWidth*scale)/2f;
       position.y = (viewHeight - imageHeight*scale)/2f;
+      rotation = 0f;
     }
   }
 
