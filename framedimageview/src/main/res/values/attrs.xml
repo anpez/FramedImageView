@@ -6,5 +6,6 @@
         <attr name="fiv_minScale" format="float" />
         <attr name="fiv_maxScale" format="float" />
         <attr name="fiv_panEnabled" format="boolean" />
+        <attr name="fiv_rotationEnabled" format="boolean" />
     </declare-styleable>
 </resources>

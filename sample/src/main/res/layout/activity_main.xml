@@ -18,6 +18,7 @@
         app:fiv_minScale="0.25"
         app:fiv_maxScale="5"
         app:fiv_panEnabled="true"
+        app:fiv_rotationEnabled="true"
         app:fiv_frame="@drawable/frame"
         app:fiv_image="@drawable/sample"/>
 </RelativeLayout>

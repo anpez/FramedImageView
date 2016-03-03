@@ -13,7 +13,7 @@ Android 2.2, API 8
 
 ```groovy
 dependencies {
-  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.3'
+  compile 'com.antonionicolaspina.framedimageview:framedimageview:0.4'
 }
 ```
 
@@ -26,6 +26,7 @@ dependencies {
     app:fiv_minScale="0.25"
     app:fiv_maxScale="5"
     app:fiv_panEnabled="true"
+    app:fiv_rotationEnabled="false"
     app:fiv_frame="@drawable/frame"
     app:fiv_image="@drawable/sample"/>
 ```

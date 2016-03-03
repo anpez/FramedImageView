@@ -14,10 +14,11 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-public final class FramedImageView extends View implements ScaleGestureDetector.OnScaleGestureListener {
+public final class FramedImageView extends View implements ScaleGestureDetector.OnScaleGestureListener, RotationGestureDetector.OnRotationGestureListener {
   private static final int INVALID_POINTER_ID = -1;
 
   private ScaleGestureDetector gestureDetector;
+  private RotationGestureDetector rotateDetector;
 
   private Bitmap image;
   private Bitmap frame;
@@ -26,6 +27,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private float scale = 1.0f;
   private float relativeScale = 1.0f;
   private Rect frameDestinationRect = new Rect();
+  private float rotation = 0f;
 
   private int activePointerId = INVALID_POINTER_ID;
   private float activePointerX;
@@ -36,6 +38,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   private int viewHeight;
 
   private boolean panEnabled;
+  private boolean rotationEnabled;
 
   /******************
    ** Constructors **
@@ -77,10 +80,12 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
       minScale = attrs.getFloat(R.styleable.FramedImageView_fiv_minScale, minScale);
       maxScale = attrs.getFloat(R.styleable.FramedImageView_fiv_maxScale, maxScale);
       panEnabled = attrs.getBoolean(R.styleable.FramedImageView_fiv_panEnabled, panEnabled);
+      rotationEnabled = attrs.getBoolean(R.styleable.FramedImageView_fiv_rotationEnabled, rotationEnabled);
       attrs.recycle();
     }
 
     gestureDetector = new ScaleGestureDetector(context, this);
+    rotateDetector  = new RotationGestureDetector(this);
   }
 
   @Override
@@ -89,8 +94,17 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
     if (null != image) {
       canvas.save();
-      canvas.translate(position.x, position.y);
+
+      if (rotationEnabled) {
+        canvas.rotate(-rotation, activePointerX, activePointerY);
+      }
+
+      if (panEnabled) {
+        canvas.translate(position.x, position.y);
+      }
+
       canvas.scale(scale, scale);
+
       canvas.drawBitmap(image, 0, 0, null);
       canvas.restore();
     }
@@ -103,6 +117,7 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     gestureDetector.onTouchEvent(event);
+    rotateDetector.onTouchEvent(event);
     super.onTouchEvent(event);
 
     final int action = event.getAction();
@@ -199,6 +214,14 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
   public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
   }
 
+  @Override
+  public void OnRotation(RotationGestureDetector rotationDetector) {
+    if (rotationEnabled) {
+      rotation = rotationDetector.getAngle();
+      invalidate();
+    }
+  }
+
   /******************
    ***** Public ****
    ******************/
@@ -266,5 +289,13 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
    */
   public PointF getOffset() {
     return new PointF(position.x/viewWidth, position.y/viewHeight);
+  }
+
+  /**
+   * Return image rotation.
+   * @return rotation in degrees.
+   */
+  public float getRotation() {
+    return -rotation;
   }
 }
