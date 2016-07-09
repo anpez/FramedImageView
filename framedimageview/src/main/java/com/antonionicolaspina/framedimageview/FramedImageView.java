@@ -122,50 +122,53 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
     rotateDetector.onTouchEvent(event);
     super.onTouchEvent(event);
 
-    final int action = event.getAction();
-    switch(action & MotionEvent.ACTION_MASK) {
-      case MotionEvent.ACTION_DOWN:
-        activePointerId = event.getPointerId(0);
-        activePointerX = event.getX(activePointerId);
-        activePointerY = event.getY(activePointerId);
-        return true;
-      case MotionEvent.ACTION_UP:
-        activePointerId = INVALID_POINTER_ID;
-        previousRotation = 0f;
-        return true;
-      case MotionEvent.ACTION_POINTER_UP: {
-        // Extract the index of the pointer that left the touch sensor
-        final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-        final int pointerId = event.getPointerId(pointerIndex);
+    try {
+      final int action = event.getAction();
+      switch (action & MotionEvent.ACTION_MASK) {
+        case MotionEvent.ACTION_DOWN:
+          activePointerId = event.getPointerId(0);
+          activePointerX = event.getX(activePointerId);
+          activePointerY = event.getY(activePointerId);
+          return true;
+        case MotionEvent.ACTION_UP:
+          activePointerId = INVALID_POINTER_ID;
+          previousRotation = 0f;
+          return true;
+        case MotionEvent.ACTION_POINTER_UP: {
+          // Extract the index of the pointer that left the touch sensor
+          final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+          final int pointerId = event.getPointerId(pointerIndex);
 
-        if (pointerId == activePointerId) { // This was our active pointer going up. Choose a new active pointer and adjust accordingly.
-          final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-          activePointerX = event.getX(newPointerIndex);
-          activePointerY = event.getY(newPointerIndex);
-          activePointerId = event.getPointerId(newPointerIndex);
+          if (pointerId == activePointerId) { // This was our active pointer going up. Choose a new active pointer and adjust accordingly.
+            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+            activePointerX = event.getX(newPointerIndex);
+            activePointerY = event.getY(newPointerIndex);
+            activePointerId = event.getPointerId(newPointerIndex);
+          }
+          return true;
         }
-        return true;
-      }
-      case MotionEvent.ACTION_MOVE: {
-        final int pointerIndex = event.findPointerIndex(activePointerId);
+        case MotionEvent.ACTION_MOVE: {
+          final int pointerIndex = event.findPointerIndex(activePointerId);
 
-        final float x = event.getX(pointerIndex);
-        final float y = event.getY(pointerIndex);
+          final float x = event.getX(pointerIndex);
+          final float y = event.getY(pointerIndex);
 
-        if (panEnabled) {
-          position.x += x - activePointerX;
-          position.y += y - activePointerY;
-          rotationCenter.x += x - activePointerX;
-          rotationCenter.y += y - activePointerY;
-          invalidate();
+          if (panEnabled) {
+            position.x += x - activePointerX;
+            position.y += y - activePointerY;
+            rotationCenter.x += x - activePointerX;
+            rotationCenter.y += y - activePointerY;
+            invalidate();
+          }
+
+          activePointerX = x;
+          activePointerY = y;
+
+          return true;
         }
-
-        activePointerX = x;
-        activePointerY = y;
-
-        return true;
       }
-    }
+    } catch (Exception e) {}
+
     return false;
   }
 
