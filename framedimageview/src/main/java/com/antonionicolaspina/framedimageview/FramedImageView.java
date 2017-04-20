@@ -118,9 +118,13 @@ public final class FramedImageView extends View implements ScaleGestureDetector.
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    gestureDetector.onTouchEvent(event);
-    rotateDetector.onTouchEvent(event);
-    super.onTouchEvent(event);
+    try {
+      gestureDetector.onTouchEvent(event);
+      rotateDetector.onTouchEvent(event);
+      super.onTouchEvent(event);
+    } catch (Exception unused) {
+      return false;
+    }
 
     try {
       final int action = event.getAction();
